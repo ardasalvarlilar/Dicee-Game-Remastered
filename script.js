@@ -21,30 +21,58 @@ diceEl.classList.add('hidden')
 const scores = [0, 0]
 let currentScore = 0
 let activePlayer = 0
+let playing = true
+
+const switchPlayer = () => {
+  document.getElementById(`current--${activePlayer}`).textContent = 0
+  currentScore = 0
+  activePlayer = activePlayer === 0 ? 1 : 0
+  player0El.classList.toggle('player--active')
+  player1El.classList.toggle('player--active')
+}
 
 // Rolling dice functionality
 btnRoll.addEventListener('click', () => {
   /*
     DONE: generate a random dice number between 1 and 6
     DONE: display dice
-    TODO: Check for rolled 1: it true, switch to next player
+    DONE: Check for rolled 1: it true, switch to next player
 
   */
+  if(playing){
+    const dice = Math.trunc(Math.random() * 6) + 1
+    diceEl.classList.remove('hidden')
+    diceEl.setAttribute('src', `dice-${dice}.png`)
 
-  const dice = Math.trunc(Math.random() * 6) + 1
-  diceEl.classList.remove('hidden')
-  diceEl.setAttribute('src', `dice-${dice}.png`)
-
-  if(dice !== 1){
-    currentScore += dice
-    document.getElementById(`current--${activePlayer}`).textContent = currentScore // tricy one
+    if(dice !== 1){
+      currentScore += dice
+      document.getElementById(`current--${activePlayer}`).textContent = currentScore // tricy one
     
-  }else{
-    // Switch player
-    document.getElementById(`current--${activePlayer}`).textContent = 0
-    currentScore = 0
-    activePlayer = activePlayer === 0 ? 1 : 0
-    player0El.classList.toggle('player--active')
-    player1El.classList.toggle('player--active')
+    }else{
+      // Switch player
+      switchPlayer() 
+    }
+  }
+})
+
+btnHold.addEventListener('click', () => {
+  /*
+    DONE: add current score to active players score
+    DONE: Check if players score is >= 100 and finish the game
+    DONE switch to the next plavyer
+  */
+
+  if(playing){
+    scores[activePlayer] += currentScore // scores[1] = scores[1] + currentScore
+    document.getElementById(`score--${activePlayer}`).textContent = scores[activePlayer]
+  
+    if(scores[activePlayer] >= 20){
+      playing = false
+      diceEl.classList.add('hidden')
+      document.querySelector(`.player--${activePlayer}`).classList.add('player--winner')
+      document.querySelector(`.player--${activePlayer}`).classList.remove('player--active')
+    }else{
+      switchPlayer()
+    }
   }
 })
